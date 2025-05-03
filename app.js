@@ -1,38 +1,39 @@
-//setup.. this is similar to when we use our default tags in html
-const express = require("express")
-var cors = require('cors')
-//activate or tell this app variable to be an express server
-const app = express()
-app.use(cors()npm )
-const router = express.Router()
+const express = require("express");
+const Song = require("./models/song");
+
+var cors = require('cors');
+
+const app = express();
+app.use(cors());
 
 
-//making an API using routes
-//Routes are used to handle browser requests. They look like URLs. The difference is that when a browser
-//requests a route, it is dynamically handled by using a function.
+app.use(express.json());
 
-router.get("/songs", function(req,res){
-    const songs = [
-    {
-        title: "We Found Love",
-        artist: "Rihanna",
-        popularity: 10,
-        releaseDate: new Date(2001, 9, 22),
-        genre: ["electro house"]
-    },
-    {
-        title: "Happy",
-        artist: "Pharell Williams",
-        popularity: 10,
-        releaseDate: new Date(2013, 11, 21),
-        genre: ["soul", "new soul"]
+const router = express.Router();
 
+//grab all the song in a database
+router.get("/songs", async(req,res) =>{
+    try{
+        const songs = await Song.find({})
+        res.send(songs)
+        console.log(songs)
     }
-    ];
-
-    res.json(songs)
+    catch (err){
+        console.log(err)
+    }
 })
 
-//all requests that usally usen an api start with /api... so th url would be localhost:3000/api/songs
-app.use("/api", router)
-app.listen(3000)
+router.post("/songs", async(req,res) =>{
+    try{
+        const song = await new Song(req.body)
+        await song.save()
+        res.status(201).json(song)
+        console.log(song)
+    }
+    catch(err){
+        res.status(400).send(err)
+    }});
+    
+app.use("/api", router);
+
+app.listen(3000);
