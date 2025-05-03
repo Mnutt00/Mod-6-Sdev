@@ -23,6 +23,16 @@ router.get("/songs", async(req,res) =>{
     }
 })
 
+router.get("/songs/:id", async(req,res) =>{
+    try{
+        const song = await Song.findById(req.params.id)
+        res.json(song)
+    }
+    catch{
+        res.status(400).send(err)
+    }
+})
+
 router.post("/songs", async(req,res) =>{
     try{
         const song = await new Song(req.body)
@@ -32,7 +42,21 @@ router.post("/songs", async(req,res) =>{
     }
     catch(err){
         res.status(400).send(err)
-    }});
+    }})
+
+
+router.put("/songs/:id", async(req,res) =>{
+    try{
+        const song = req.body
+        await Song.updateOne({_id:req.params.id}, song)
+        console.log(song)
+        res.sendStatus(204)
+
+    }
+    catch(err){
+        res.status(400).send(err)
+    }
+})
     
 app.use("/api", router);
 
